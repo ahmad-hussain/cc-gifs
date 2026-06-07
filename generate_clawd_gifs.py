@@ -4237,7 +4237,7 @@ def sc_levitating(draw, f, img):
         draw.rectangle([sx-2, sy-2, sx+2, sy+2], fill=WHITE if i % 2 == 0 else LIGHT_BLUE)
 
 
-def sc_lollygaging(draw, f, img):
+def sc_lollygagging(draw, f, img):
     """Clawd slow-rolls forward with a distinctly lazy, do-nothing pace."""
     xs = [40, 46, 48, 54, 56, 64]
     ys = [178, 172, 178, 172, 178, 174]
@@ -4482,29 +4482,6 @@ def sc_noodling(draw, f, img):
             draw_music_note(draw, nx2, ny2, CORAL)
 
 
-def sc_nucleating(draw, f, img):
-    draw_clawd(draw, 30, 170, g, frame=f)
-    cx2, cy2 = 290, 180
-    cr = 4 + f * 3
-    draw.ellipse([cx2-cr, cy2-cr, cx2+cr, cy2+cr], fill=TEAL)
-    for i in range(8):
-        a = math.radians(i * 45 + f * 20)
-        r = 60 - f * 6
-        px = cx2 + int(r * math.cos(a))
-        py = cy2 + int(r * math.sin(a))
-        draw.ellipse([px-3, py-3, px+3, py+3], fill=LIGHT_BLUE)
-
-
-def sc_osmosing(draw, f, img):
-    draw_clawd(draw, 30, 160, g, frame=f)
-    mx = 250
-    for y in range(80, 300, 12):
-        draw.rectangle([mx, y, mx+3, y+6], fill=GRAY)
-    for i in range(5):
-        px = 220 - f * 6 + i * 4 if i % 2 == 0 else 280 + f * 6 - i * 4
-        py = 100 + i * 35 + ((f + i) % 3) * 5
-        c = BLUE if i % 2 == 0 else GREEN
-        draw.ellipse([px-4, py-4, px+4, py+4], fill=c)
 
 
 def sc_percolating(draw, f, img):
@@ -4635,20 +4612,6 @@ def sc_precipitating(draw, f, img):
     ph = f * 8
     draw.rectangle([bx2+10, by2+115-ph, bx2+70, by2+115], fill=WHITE)
 
-
-def sc_prestidigitating(draw, f, img):
-    draw_clawd(draw, 80, 170, g, frame=f)
-    for i in range(5):
-        a = -20 + i * 10 + f * 3
-        cx2, cy2 = 280, 200
-        rx = cx2 + int(30 * math.cos(math.radians(a)))
-        ry = cy2 + int(20 * math.sin(math.radians(a)))
-        draw.rectangle([rx-8, ry-12, rx+8, ry+12], fill=WHITE)
-        draw.rectangle([rx-6, ry-10, rx+6, ry+10], fill=[RED, BLUE, GREEN, YELLOW, PURPLE][i])
-    for i in range(3):
-        sx = 250 + ((f * 15 + i * 30) % 100)
-        sy = 130 + ((f * 10 + i * 20) % 50)
-        draw.rectangle([sx, sy, sx+3, sy+3], fill=YELLOW)
 
 
 def sc_proofing(draw, f, img):
@@ -4934,6 +4897,60 @@ def sc_smooshing(draw, f, img):
     draw.polygon([(ox2+w2+15, oy2+25), (ox2+w2, oy2+15), (ox2+w2, oy2+35)], fill=RED)
 
 
+def sc_sock_hopping(draw, f, img):
+    """Clawd grooves at a retro sock hop with a jukebox, checker floor, and socks-only dance moves."""
+    floor_y = 276
+    tile = 26
+    for row in range(5):
+        for col in range(16):
+            x0 = col * tile
+            y0 = floor_y + row * tile
+            color = (250, 236, 208) if (row + col + f) % 2 == 0 else (214, 172, 118)
+            draw.rectangle([x0, y0, x0 + tile, y0 + tile], fill=color)
+
+    clawd_x = 90 + [-6, 4, 10, 2, -8, 0][f]
+    clawd_y = 158 + [0, -12, -4, -10, 2, -6][f]
+    draw_clawd(draw, clawd_x, clawd_y, g, blink=(f == 3), frame=f)
+
+    sock_y = clawd_y + 6 * g + g // 2
+    for lc in [0, 2, 5, 7]:
+        sx = clawd_x + lc * g
+        draw.rectangle([sx, sock_y, sx + g - 1, sock_y + g - 1], fill=WHITE)
+        draw.line([sx, sock_y + 2, sx + g - 1, sock_y + 2], fill=LIGHT_BLUE, width=1)
+
+    # Shoes kicked off at the edge of the dance floor.
+    for shoe_x, shoe_y, tilt in [(28, 314, -1), (62, 320, 1)]:
+        draw.ellipse([shoe_x, shoe_y, shoe_x + 26, shoe_y + 12], fill=DARK_BROWN)
+        draw.line([shoe_x + 6, shoe_y + 4, shoe_x + 18, shoe_y + 4 + tilt], fill=BLACK, width=1)
+
+    # Retro jukebox on the right.
+    jx, jy = 278, 132
+    draw.rounded_rectangle([jx, jy, jx + 86, jy + 126], radius=18, fill=(214, 188, 148), outline=DARK_BROWN, width=3)
+    draw.arc([jx + 12, jy + 8, jx + 74, jy + 76], 180, 360, fill=RED, width=5)
+    draw.arc([jx + 18, jy + 14, jx + 68, jy + 70], 180, 360, fill=YELLOW, width=4)
+    draw.rectangle([jx + 18, jy + 58, jx + 68, jy + 98], fill=TEAL, outline=DARK_BROWN)
+    for i, color in enumerate([PINK, LIGHT_BLUE, YELLOW]):
+        bx = jx + 26 + i * 14
+        draw.rectangle([bx, jy + 66, bx + 8, jy + 92], fill=color)
+    draw.rectangle([jx + 24, jy + 104, jx + 62, jy + 114], fill=DARK_BROWN)
+    light_offsets = [0, 1, 2, 1, 0, 2]
+    for i, color in enumerate([RED, YELLOW, LIGHT_BLUE, PINK]):
+        if i == light_offsets[f]:
+            draw.ellipse([jx + 10 + i * 16, jy + 110, jx + 18 + i * 16, jy + 118], fill=color)
+
+    # Music and sparkle accents.
+    note_specs = [
+        (228, 84 + [0, -8, -14, -6, 2, -4][f], PINK),
+        (324, 74 + [-4, -12, -16, -8, 0, -6][f], YELLOW),
+        (362, 118 + [2, -4, -10, -2, 4, -2][f], LIGHT_BLUE),
+    ]
+    for nx, ny, color in note_specs:
+        draw_music_note(draw, nx, ny, color)
+    for sx, sy in [(158, 108), (212, 132), (248, 96)]:
+        if f % 2 == 0:
+            draw_text(draw, "*", sx + (f % 3) * 2, sy - (f % 2) * 4, color=WHITE, scale=2)
+
+
 def sc_spelunking(draw, f, img):
     draw.polygon([(0, 100), (50, 50), (150, 80), (200, 40), (300, 70), (380, 50),
                   (400, 100), (400, 400), (0, 400)], fill=DARK_GRAY)
@@ -5125,67 +5142,9 @@ def sc_synthesizing(draw, f, img):
             draw.rectangle([x, y2, x+3, y2+2], fill=c)
 
 
-def sc_thundering(draw, f, img):
-    draw_clawd(draw, 120, 185, g, frame=f)
-    for cx2, cy2 in [(100, 40), (200, 30), (300, 45)]:
-        draw.ellipse([cx2-30, cy2-15, cx2+30, cy2+15], fill=DARK_GRAY)
-        draw.ellipse([cx2-20, cy2-25, cx2+20, cy2+5], fill=DARK_GRAY)
-    if f % 2 == 0:
-        lx = 200
-        draw.polygon([(lx, 55), (lx-15, 100), (lx+5, 95), (lx-10, 140),
-                       (lx+20, 85), (lx, 90)], fill=YELLOW)
 
 
-def sc_tinkering(draw, f, img):
-    draw_clawd(draw, 30, 160, g, frame=f)
-    draw.rectangle([220, 260, 380, 272], fill=BROWN)
-    items = [(230, 240, GRAY), (270, 245, BLUE), (310, 242, GREEN), (350, 248, RED)]
-    for ix, iy, ic in items:
-        draw.rectangle([ix, iy, ix+20, iy+18], fill=ic)
-    sa = [-20, -10, 0, 10, 0, -10][f]
-    sx, sy = 280, 230
-    draw.line([sx, sy, sx+int(20*math.cos(math.radians(sa))),
-               sy+int(20*math.sin(math.radians(sa)))], fill=YELLOW, width=2)
 
-
-def sc_tomfoolering(draw, f, img):
-    bounce = [0, -10, -18, -10, 0, 5][f]
-    draw_clawd(draw, 130, 170 + bounce, g, frame=f)
-    hx = 130 + g
-    hy = 170 + bounce - g
-    draw.polygon([(hx, hy), (hx+3*g, hy-2*g), (hx+g, hy)], fill=RED)
-    draw.polygon([(hx+3*g, hy), (hx+5*g, hy-2*g), (hx+5*g, hy)], fill=YELLOW)
-    draw.ellipse([hx+3*g-4, hy-2*g-4, hx+3*g+4, hy-2*g+4], fill=GREEN)
-    draw.ellipse([hx+5*g-4, hy-2*g-4, hx+5*g+4, hy-2*g+4], fill=BLUE)
-
-
-def sc_topsy_turvying(draw, f, img):
-    flip = f * 30
-    draw_clawd(draw, 130, 170, g, frame=f)
-    for i in range(4):
-        a = math.radians(flip + i * 90)
-        r = 80
-        ox2 = 200 + int(r * math.cos(a))
-        oy2 = 180 + int(r * math.sin(a))
-        c = [BLUE, GREEN, RED, YELLOW][i]
-        draw.rectangle([ox2-8, oy2-8, ox2+8, oy2+8], fill=c)
-
-
-def sc_transmuting(draw, f, img):
-    draw_clawd(draw, 30, 160, g, frame=f)
-    bx2, by2 = 260, 200
-    lead_w = max(0, 50 - f * 10)
-    gold_w = min(50, f * 10)
-    if lead_w > 0:
-        draw.rectangle([bx2, by2, bx2+lead_w, by2+40], fill=DARK_GRAY)
-    if gold_w > 0:
-        draw.rectangle([bx2+lead_w, by2, bx2+50, by2+40], fill=YELLOW)
-    draw.ellipse([bx2-10, by2-40, bx2+60, by2+60], outline=PURPLE, width=1)
-    for i in range(3):
-        if (f + i) % 2 == 0:
-            sx = bx2 + 10 + i * 15
-            sy = by2 - 10 - ((f + i) % 3) * 8
-            draw.rectangle([sx, sy, sx+3, sy+3], fill=YELLOW)
 
 
 def sc_twisting(draw, f, img):
@@ -5240,18 +5199,6 @@ def sc_undulating(draw, f, img):
         py = 286 + int(math.sin((i * 20 + f * 30) * 0.1) * 6)
         draw.arc([px - 14, py - 6, px + 14, py + 6], 180, 360, fill=LIGHT_BLUE, width=2)
 
-
-def sc_unfurling(draw, f, img):
-    draw_clawd(draw, 30, 160, g, frame=f)
-    sx2, sy2 = 230, 120
-    unroll = f * 25
-    draw.rectangle([sx2, sy2, sx2+8, sy2+150], fill=DARK_BROWN)
-    draw.rectangle([sx2+8, sy2, sx2+8+unroll, sy2+100], fill=(255, 240, 220))
-    if unroll > 0:
-        draw.ellipse([sx2+8+unroll-5, sy2, sx2+8+unroll+10, sy2+15], fill=(255, 240, 220))
-    if f >= 3:
-        for i in range(min(f-2, 3)):
-            draw.rectangle([sx2+15, sy2+15+i*20, sx2+15+min(unroll-10, 60), sy2+20+i*20], fill=GRAY)
 
 
 def sc_unravelling(draw, f, img):
@@ -5364,63 +5311,7 @@ def sc_wizarding(draw, f, img):
             draw.rectangle([sx-2, sy-2, sx+2, sy+2], fill=[YELLOW, PINK, PURPLE, WHITE, TEAL, ORANGE][i])
 
 
-def sc_wrangling(draw, f, img):
-    draw_clawd(draw, 30, 165, g, frame=f)
-    lx = 30 + 10 * g + 5
-    ly = 165 + g
-    rope_r = 30 + f * 3
-    draw.ellipse([lx+20, ly-rope_r, lx+20+rope_r*2, ly+rope_r], outline=BROWN, width=2)
-    blocks = [(250, 200), (300, 180), (280, 240), (330, 220), (260, 160)]
-    for i, (bx2, by2) in enumerate(blocks):
-        jx = int(5 * math.sin(f * 1.2 + i))
-        jy = int(5 * math.cos(f * 1.5 + i))
-        draw.rectangle([bx2+jx, by2+jy, bx2+16+jx, by2+16+jy],
-                        fill=[RED, BLUE, GREEN, YELLOW, PURPLE][i])
 
-
-def sc_whirlpooling(draw, f, img):
-    draw_clawd(draw, 120, 160, g, frame=f)
-    cx2, cy2 = 120 + 4 * g, 300
-    for i in range(30):
-        a = math.radians(i * 25 + f * 20)
-        r = 5 + i * 3
-        px = cx2 + int(r * math.cos(a))
-        py = cy2 - 20 + int(r * math.sin(a) * 0.4)
-        c = BLUE if i % 2 == 0 else TEAL
-        draw.rectangle([px-2, py-2, px+2, py+2], fill=c)
-
-
-def sc_recombobulating(draw, f, img):
-    """Clawd's pixels reassembling — reverse of discombobulation."""
-    cx, cy = 130, 170
-    scatter = max(0, (5 - f) * 10)
-    rng = random.Random(42)
-
-    def shifted_rect(x1, y1, x2, y2, color):
-        ox2 = rng.randint(-scatter, scatter)
-        oy2 = rng.randint(-scatter, scatter)
-        draw.rectangle([x1+ox2, y1+oy2, x2+ox2, y2+oy2], fill=color)
-
-    for gx2 in range(8):
-        for gy2 in range(2):
-            shifted_rect(cx+gx2*g, cy+gy2*g, cx+(gx2+1)*g-1, cy+(gy2+1)*g-1, CORAL)
-    if scatter < 15:
-        draw.rectangle([cx+1*g, cy+1*g, cx+2*g-1, cy+2*g-1], fill=BLACK)
-        draw.rectangle([cx+6*g, cy+1*g, cx+7*g-1, cy+2*g-1], fill=BLACK)
-    for gx2 in range(-2, 10):
-        for gy2 in range(2, 4):
-            shifted_rect(cx+gx2*g, cy+gy2*g, cx+(gx2+1)*g-1, cy+(gy2+1)*g-1, CORAL)
-    for gx2 in range(8):
-        for gy2 in range(4, 6):
-            shifted_rect(cx+gx2*g, cy+gy2*g, cx+(gx2+1)*g-1, cy+(gy2+1)*g-1, CORAL)
-    for lc in [0, 2, 5, 7]:
-        for gy2 in range(6, 8):
-            shifted_rect(cx+lc*g, cy+gy2*g, cx+(lc+1)*g-1, cy+(gy2+1)*g-1, CORAL)
-    if f >= 4:
-        for i in range(5):
-            sx = cx - 20 + i * 50
-            sy = cy - 15 + (i % 2) * 10
-            draw.rectangle([sx, sy, sx+4, sy+4], fill=YELLOW)
 
 
 def sc_roosting(draw, f, img):
@@ -6943,7 +6834,7 @@ def main():
         "Kneading": sc_kneading,
         "Leavening": sc_leavening,
         "Levitating": sc_levitating,
-        "Lollygaging": sc_lollygaging,
+        "Lollygagging": sc_lollygagging,
         "Manifesting": sc_manifesting,
         "Marinating": sc_marinating,
         "Meandering": sc_meandering,
@@ -6981,6 +6872,7 @@ def main():
         "Simmering": sc_simmering,
         "Slithering": sc_slithering,
         "Smooshing": sc_smooshing,
+        "Sock-hopping": sc_sock_hopping,
         "Spelunking": sc_spelunking,
         "Spinning": sc_spinning,
         "Sprouting": sc_sprouting,
