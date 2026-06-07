@@ -13,7 +13,7 @@ This repository is an unofficial technical/art experiment. The code in this repo
 ## What’s Included
 
 - `generate_clawd_gifs.py`: the unified generator for all official Clawd spinner scenes
-- `spinner-words.md`: the full official catalog of 149 spinner words with Chinese translations and descriptions
+- `spinner-words.md`: the catalog of 195 spinner entries (165 drawn, 30 pending) with Chinese translations, scene descriptions, and an "官方语义" column noting the upstream verb's intent
 - `CLAUDE.md` and `AGENTS.md`: working notes and agent-facing repository instructions
 - `requirements.txt`: minimal runtime dependency list
 - `LICENSE`: MIT license for repository code
@@ -46,7 +46,7 @@ Generated GIFs are written to:
 generated/Clawd-{Word}.gif
 ```
 
-The generator currently covers **149 official spinner words**. Most compact scenes render as 6-frame loops at 170ms per frame, while some handcrafted scenes use longer timelines.
+The generator currently draws **165 spinner scenes** (157 official Claude Code spinner verbs + 8 repo extensions). 30 official verbs are catalogued as pending. Most compact scenes render as 6-frame loops at 170ms per frame, while some handcrafted scenes use longer timelines.
 
 ## Project Structure
 
@@ -75,7 +75,7 @@ For more repo-specific implementation details, see [CLAUDE.md](./CLAUDE.md).
 
 ## Spinner Catalog
 
-The full official word list lives in [spinner-words.md](./spinner-words.md).
+The full word list lives in [spinner-words.md](./spinner-words.md).
 
 It includes:
 
@@ -83,6 +83,18 @@ It includes:
 - Chinese translations
 - scene descriptions
 - generation status tracking
+
+### Catalog Scope
+
+This repo's catalog is **not a 1:1 mirror** of the upstream Claude Code default `spinnerVerbs` list. Anthropic does not publish the canonical list, and the defaults shift between versions (e.g. Claude Code `2.1.42` was reported as 185 verbs, while `2.1.153` is **187**).
+
+Concretely, against Claude Code `2.1.153`:
+
+- **157** official defaults are drawn ✅
+- **30** official defaults are catalogued as pending ⏳ (e.g. `Bootstrapping`, `Crystallizing`, `Doodling`, `Grooving`, `Improvising`, `Orchestrating`, `Tempering`, …)
+- **8** entries are repo extensions outside the current official defaults: `Conjuring`, `Divining`, `Hustling`, `Jiving`, `Scheming`, `Shucking`, `Sussing`, `Wizarding`
+
+We do not commit to tracking every upstream change; the goal is a curated, illustrated subset rather than full coverage.
 
 ## Credits
 

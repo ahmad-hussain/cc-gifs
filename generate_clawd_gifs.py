@@ -213,6 +213,7 @@ FONT_GLYPHS = {
     '!': ["00100","00100","00100","00100","00100","00000","00100"],
     '?': ["01110","10001","00001","00110","00100","00000","00100"],
     ',': ["00000","00000","00000","00000","00000","00100","01000"],
+    "'": ["00100","00100","00100","00000","00000","00000","00000"],
     ':': ["00000","00000","00100","00000","00000","00100","00000"],
     '$': ["00100","01111","10100","01110","00101","11110","00100"],
     '%': ["11001","11010","00100","01000","10110","00110","00000"],
@@ -3852,7 +3853,7 @@ def make_frames(word, draw_scene_fn):
     return frames
 
 
-def sc_bebopping(draw, f, img):
+def sc_beboppin(draw, f, img):
     """Clawd head-bops through a jazzier, syncopated groove with sharper notes and beat marks."""
     cx = 126 + [-2, 2, 4, 0, -4, -1][f]
     cy = 172 + [6, -6, 2, -8, 0, -4][f]
@@ -6737,6 +6738,348 @@ def frames_gesticulating():
 
 
 # ---------------------------------------------------------------------------
+# Catalog-alignment scenes (added to cover official spinner verbs missing from earlier passes).
+# ---------------------------------------------------------------------------
+def sc_thinking(draw, f, img):
+    """Clawd ponders with a swelling thought bubble and trailing dots."""
+    tilt = [0, -1, -2, -2, -1, 0][f]
+    cx, cy = 80, 175 + tilt
+    draw_clawd(draw, cx, cy, g, frame=f)
+    dot_specs = [(cx + 9 * g, cy - 6, 6), (cx + 10 * g + 6, cy - 24, 8), (cx + 11 * g + 6, cy - 46, 10)]
+    for i, (dx, dy, dr) in enumerate(dot_specs):
+        if f >= i:
+            draw.ellipse([dx, dy, dx + dr, dy + dr], fill=WHITE, outline=GRAY)
+    if f >= 3:
+        bx, by = cx + 12 * g, cy - 110
+        draw_thought_bubble(draw, bx, by, 120, 70)
+        for i in range(3):
+            dx = bx + 26 + i * 22
+            if f - 3 >= i:
+                draw.ellipse([dx, by + 38, dx + 8, by + 46], fill=DARK_GRAY)
+
+
+def sc_working(draw, f, img):
+    """Clawd bobs over a desk with a turning gear and pulsing checklist."""
+    bob = [0, -1, -2, -1, 0, 1][f]
+    cx, cy = 70, 175 + bob
+    draw_clawd(draw, cx, cy, g, frame=f)
+    desk_x, desk_y = 220, 250
+    draw.rectangle([desk_x, desk_y, desk_x + 150, desk_y + 12], fill=DARK_BROWN)
+    draw.rectangle([desk_x + 8, desk_y + 12, desk_x + 22, desk_y + 60], fill=DARK_BROWN)
+    draw.rectangle([desk_x + 128, desk_y + 12, desk_x + 142, desk_y + 60], fill=DARK_BROWN)
+    paper_x, paper_y = desk_x + 16, desk_y - 50
+    draw.rectangle([paper_x, paper_y, paper_x + 60, paper_y + 48], fill=WHITE, outline=GRAY)
+    for i in range(4):
+        ly = paper_y + 10 + i * 9
+        draw.rectangle([paper_x + 14, ly, paper_x + 52, ly + 3], fill=GRAY)
+        if i < min(f, 4):
+            draw.line([paper_x + 6, ly + 1, paper_x + 11, ly + 4], fill=GREEN, width=2)
+            draw.line([paper_x + 11, ly + 4, paper_x + 13, ly - 2], fill=GREEN, width=2)
+    draw_gear(draw, desk_x + 110, desk_y - 24, 14, step=f % 2)
+
+
+def sc_calculating(draw, f, img):
+    """Clawd stands by a chalkboard scratching out arithmetic, digits popping in."""
+    bob = [0, -1, 0, 1, 0, -1][f]
+    draw_clawd(draw, 50, 175 + bob, g, frame=f)
+    bx, by = 196, 110
+    bw, bh = 180, 140
+    draw.rectangle([bx, by, bx + bw, by + bh], fill=DARK_BROWN)
+    draw.rectangle([bx + 6, by + 6, bx + bw - 6, by + bh - 6], fill=(30, 70, 110))
+    lines = ["2 + 2 =", "x * y", "f(n) = n!", "= 0xBEEF"]
+    for i, txt in enumerate(lines):
+        if f >= i:
+            draw_text(draw, txt, bx + 18, by + 18 + i * 24, color=WHITE, scale=3)
+    cursor_x = bx + 18 + len(lines[min(f, 3)]) * 5 * 3 + 2
+    if f % 2 == 0:
+        draw.rectangle([cursor_x, by + 18 + min(f, 3) * 24, cursor_x + 6, by + 18 + min(f, 3) * 24 + 14], fill=YELLOW)
+
+
+def sc_processing(draw, f, img):
+    """Three meshed gears spin behind Clawd, ticking through processing cycles."""
+    draw_clawd(draw, 50, 175, g, blink=(f == 4), frame=f)
+    gear_specs = [(244, 150, 28), (304, 200, 22), (244, 246, 18)]
+    for i, (gx, gy, gs) in enumerate(gear_specs):
+        draw_gear(draw, gx, gy, gs, step=(f + i) % 2)
+    for i in range(3):
+        tx = 224 + i * 28
+        ty = 110 - (f * 2)
+        if (f + i) % 2 == 0:
+            draw.ellipse([tx, ty, tx + 6, ty + 6], fill=LIGHT_BLUE)
+
+
+def sc_computing(draw, f, img):
+    """Clawd hunches over a CRT terminal pumping scrolling binary streams."""
+    draw_clawd(draw, 36, 178, g, frame=f)
+    mx, my = 210, 130
+    mw, mh = 170, 130
+    draw.rectangle([mx, my, mx + mw, my + mh], fill=DARK_GRAY)
+    screen_pad = 10
+    sx, sy = mx + screen_pad, my + screen_pad
+    sw, sh = mw - 2 * screen_pad, mh - 2 * screen_pad
+    draw.rectangle([sx, sy, sx + sw, sy + sh], fill=(12, 26, 45))
+    bits = ["10110100", "01001101", "11100010", "00111011", "10010110"]
+    for i in range(5):
+        row = (i + f) % 5
+        draw_text(draw, bits[row], sx + 6, sy + 6 + i * 18, color=GREEN, scale=2)
+    draw.rectangle([mx + 60, my + mh, mx + mw - 60, my + mh + 14], fill=GRAY)
+    draw.rectangle([mx + 20, my + mh + 14, mx + mw - 20, my + mh + 24], fill=DARK_GRAY)
+
+
+def sc_generating(draw, f, img):
+    """Clawd channels a stream of particles that thicken into a glowing block."""
+    draw_clawd(draw, 40, 175, g, frame=f)
+    src_x, src_y = 40 + 10 * g, 175 + 3 * g
+    target_x, target_y = 320, 200
+    density = f + 1
+    for i in range(density * 4):
+        rng = random.Random(f * 31 + i)
+        t = rng.random()
+        px = int(src_x + (target_x - src_x) * t + rng.randint(-6, 6))
+        py = int(src_y + (target_y - src_y) * t + rng.randint(-12, 12))
+        color = [YELLOW, TEAL, PINK, LIGHT_BLUE][i % 4]
+        draw.rectangle([px, py, px + 3, py + 3], fill=color)
+    block_w = 6 + f * 8
+    block_h = 6 + f * 8
+    bx0 = target_x - block_w // 2
+    by0 = target_y - block_h // 2
+    draw.rectangle([bx0, by0, bx0 + block_w, by0 + block_h], fill=(255, 236, 160), outline=ORANGE)
+    if f >= 2:
+        draw.rectangle([bx0 + 3, by0 + 3, bx0 + block_w - 3, by0 + block_h - 3], fill=WHITE)
+
+
+def sc_creating(draw, f, img):
+    """Clawd cups a glowing orb between its hands that pulses brighter over time."""
+    draw_clawd(draw, 110, 175, g, expression="cheeky" if f == 3 else None, frame=f)
+    ox, oy = 110 + 6 * g, 175 + 2 * g
+    glow = 10 + f * 5
+    pulse = (f % 2) * 2
+    draw.ellipse([ox - glow - 4, oy - glow - 4, ox + glow + 4, oy + glow + 4], fill=(255, 240, 170))
+    draw.ellipse([ox - glow + pulse, oy - glow + pulse, ox + glow - pulse, oy + glow - pulse], fill=YELLOW)
+    inner = max(4, glow // 2)
+    draw.ellipse([ox - inner, oy - inner, ox + inner, oy + inner], fill=WHITE)
+    for i in range(6):
+        ang = (f * 30 + i * 60) * math.pi / 180
+        sx = int(ox + math.cos(ang) * (glow + 10))
+        sy = int(oy + math.sin(ang) * (glow + 10))
+        draw_text(draw, "*", sx, sy, color=YELLOW, scale=2)
+
+
+def sc_whisking(draw, f, img):
+    """Clawd whisks a bowl while batter splashes over the rim."""
+    bob = [0, -1, -1, 0, 1, 0][f]
+    cx, cy = 70, 175 + bob
+    draw_clawd(draw, cx, cy, g, accessories=["chef_hat"], frame=f)
+    bowl_x, bowl_y = 230, 240
+    bowl_w, bowl_h = 110, 50
+    draw.chord([bowl_x, bowl_y, bowl_x + bowl_w, bowl_y + bowl_h * 2], 0, 180, fill=DARK_GRAY)
+    draw.rectangle([bowl_x + 6, bowl_y, bowl_x + bowl_w - 6, bowl_y + 14], fill=(255, 236, 160))
+    angle_off = [0, 30, 60, 90, 60, 30][f]
+    whisk_top_x = bowl_x + bowl_w // 2 + int(math.cos(math.radians(angle_off - 90)) * 30)
+    whisk_top_y = bowl_y - 30
+    draw.line([bowl_x + bowl_w // 2, bowl_y + 18, whisk_top_x, whisk_top_y], fill=GRAY, width=3)
+    for i in range(3):
+        off = 6 + i * 3
+        draw.arc([bowl_x + bowl_w // 2 - off, bowl_y - 4, bowl_x + bowl_w // 2 + off, bowl_y + 16],
+                 200 + angle_off, 340 + angle_off, fill=GRAY, width=1)
+    for i in range(4):
+        rng = random.Random(f * 11 + i)
+        sx = bowl_x + 14 + rng.randint(0, bowl_w - 28)
+        sy = bowl_y - rng.randint(8, 30)
+        draw.ellipse([sx, sy, sx + 4, sy + 4], fill=(255, 236, 160))
+
+
+def sc_garnishing(draw, f, img):
+    """Clawd sprinkles green herbs over a finished plate."""
+    bob = [0, -1, 0, 1, 0, -1][f]
+    cx, cy = 70, 175 + bob
+    draw_clawd(draw, cx, cy, g, accessories=["chef_hat"], frame=f)
+    plate_x, plate_y = 224, 270
+    draw.ellipse([plate_x, plate_y, plate_x + 130, plate_y + 30], fill=WHITE, outline=GRAY)
+    draw.ellipse([plate_x + 18, plate_y + 4, plate_x + 112, plate_y + 26], fill=(244, 229, 196))
+    draw.ellipse([plate_x + 36, plate_y + 8, plate_x + 90, plate_y + 22], fill=(230, 184, 159))
+    hand_x = cx + 10 * g
+    hand_y = cy + 18
+    pinch_open = 4 + (f % 3)
+    draw.rectangle([hand_x, hand_y, hand_x + 6, hand_y + pinch_open], fill=CLAWD_SHADOW)
+    for i in range(8):
+        rng = random.Random(f * 7 + i)
+        hx = hand_x + 3 + rng.randint(-3, 3)
+        hy = hand_y + pinch_open + 4 + rng.randint(0, 60) + f * 6
+        if hy < plate_y + 6:
+            draw.rectangle([hx, hy, hx + 3, hy + 3], fill=GREEN)
+
+
+def sc_drizzling(draw, f, img):
+    """Clawd tilts an oil bottle while a stream of droplets pools onto a dish."""
+    cx, cy = 60, 175
+    draw_clawd(draw, cx, cy, g, accessories=["chef_hat"], frame=f)
+    bottle_x = cx + 9 * g
+    bottle_y = cy + 8
+    tilt = [0, -4, -8, -10, -6, -2][f]
+    draw.polygon([(bottle_x, bottle_y), (bottle_x + 30, bottle_y - 6 + tilt),
+                  (bottle_x + 34, bottle_y + 38 + tilt), (bottle_x + 6, bottle_y + 44)],
+                 fill=GREEN, outline=DARK_GRAY)
+    draw.rectangle([bottle_x + 32, bottle_y - 2 + tilt, bottle_x + 38, bottle_y + 6 + tilt], fill=DARK_GRAY)
+    plate_x, plate_y = 240, 296
+    draw.ellipse([plate_x, plate_y, plate_x + 130, plate_y + 26], fill=WHITE, outline=GRAY)
+    drip_origin_x = bottle_x + 36
+    drip_origin_y = bottle_y + 2 + tilt
+    for i in range(f + 1):
+        dy = drip_origin_y + i * 24
+        if dy < plate_y + 6:
+            draw.ellipse([drip_origin_x + i * 6, dy, drip_origin_x + i * 6 + 5, dy + 7], fill=(230, 190, 60))
+    for i in range(min(f, 3)):
+        px = plate_x + 30 + i * 22
+        draw.ellipse([px, plate_y + 8, px + 18, plate_y + 14], fill=(230, 190, 60))
+
+
+def sc_photosynthesizing(draw, f, img):
+    """Clawd absorbs sunbeams through a leaf overhead while CO2 swirls in and O2 puffs out."""
+    bob = [0, -1, -2, -1, 0, 1][f]
+    cx, cy = 110, 180 + bob
+    draw_clawd(draw, cx, cy, g, frame=f)
+    sun_x, sun_y, sr = 320, 80, 28
+    draw.ellipse([sun_x - sr, sun_y - sr, sun_x + sr, sun_y + sr], fill=(255, 224, 96), outline=ORANGE)
+    for i in range(8):
+        ang = (f * 12 + i * 45) * math.pi / 180
+        r1 = sr + 6
+        r2 = sr + 18
+        x0 = sun_x + int(math.cos(ang) * r1)
+        y0 = sun_y + int(math.sin(ang) * r1)
+        x1 = sun_x + int(math.cos(ang) * r2)
+        y1 = sun_y + int(math.sin(ang) * r2)
+        draw.line([x0, y0, x1, y1], fill=YELLOW, width=2)
+    leaf_cx, leaf_cy = cx + 4 * g, cy - 32
+    draw.ellipse([leaf_cx - 30, leaf_cy - 14, leaf_cx + 30, leaf_cy + 14], fill=(40, 154, 70), outline=(30, 110, 45))
+    draw.line([leaf_cx - 28, leaf_cy, leaf_cx + 28, leaf_cy], fill=(30, 110, 45), width=1)
+    for i in range(3):
+        beam_t = (f + i) % 3
+        bx = leaf_cx - 16 + i * 16
+        draw.line([sun_x - 10, sun_y + 10, bx, leaf_cy - 6], fill=(255, 244, 170), width=1)
+    for i in range(f + 1):
+        ox = cx + 11 * g + i * 6
+        oy = cy - 4 - i * 12
+        draw_text(draw, "O", ox, oy, color=LIGHT_BLUE, scale=2)
+        draw_text(draw, "2", ox + 10, oy + 6, color=LIGHT_BLUE, scale=1)
+
+
+def sc_orbiting(draw, f, img):
+    """Two satellites loop around Clawd along elliptical trails."""
+    draw_clawd(draw, 130, 180, g, frame=f)
+    center_x, center_y = 130 + 4 * g, 180 + 3 * g
+    for ring_r, color in [(110, LIGHT_BLUE), (150, PURPLE)]:
+        for ang_deg in range(0, 360, 12):
+            ang = ang_deg * math.pi / 180
+            px = center_x + int(math.cos(ang) * ring_r)
+            py = center_y + int(math.sin(ang) * ring_r * 0.45)
+            draw.ellipse([px - 1, py - 1, px + 1, py + 1], fill=color)
+    sat_specs = [(110, 0.45, f * 60, YELLOW, 7), (150, 0.45, f * -45 + 30, PINK, 5)]
+    for ring_r, squash, phase, color, size in sat_specs:
+        ang = phase * math.pi / 180
+        sx = center_x + int(math.cos(ang) * ring_r)
+        sy = center_y + int(math.sin(ang) * ring_r * squash)
+        draw.ellipse([sx - size, sy - size, sx + size, sy + size], fill=color, outline=DARK_GRAY)
+        draw.line([sx, sy - size - 1, sx, sy - size - 8], fill=color, width=1)
+
+
+def sc_architecting(draw, f, img):
+    """Clawd holds a blueprint while pixel building blocks stack up next to it."""
+    cx, cy = 60, 180
+    draw_clawd(draw, cx, cy, g, frame=f)
+    bp_x, bp_y = cx + 9 * g, cy + g
+    bp_w, bp_h = 70, 56
+    draw.rectangle([bp_x, bp_y, bp_x + bp_w, bp_y + bp_h], fill=(20, 65, 124), outline=WHITE)
+    for i in range(4):
+        ly = bp_y + 8 + i * 12
+        draw.line([bp_x + 8, ly, bp_x + bp_w - 8, ly], fill=WHITE, width=1)
+    draw.rectangle([bp_x + 14, bp_y + 14, bp_x + 30, bp_y + bp_h - 14], fill=None, outline=WHITE, width=1)
+    base_x, base_y = 250, 290
+    block_w = 24
+    levels = [4, 3, 2, 1]
+    for lvl_idx, count in enumerate(levels):
+        if f < lvl_idx:
+            continue
+        for i in range(count):
+            shake = [0, -1, 0, 1, 0, -1][(f + lvl_idx + i) % 6] if lvl_idx == min(f, 3) else 0
+            x0 = base_x + i * (block_w + 2) + (lvl_idx * (block_w // 2))
+            y0 = base_y - lvl_idx * (block_w + 2) + shake
+            draw.rectangle([x0, y0, x0 + block_w, y0 + block_w], fill=ORANGE, outline=DARK_BROWN)
+            draw.rectangle([x0 + 4, y0 + 4, x0 + block_w - 4, y0 + 12], fill=YELLOW)
+
+
+def sc_moonwalking(draw, f, img):
+    """Clawd slides backward across a stage with a moon and motion trail."""
+    slide = [220, 200, 175, 150, 125, 105][f]
+    draw_clawd(draw, slide, 180, g, frame=f)
+    moon_x, moon_y, mr = 320, 90, 36
+    draw.ellipse([moon_x - mr, moon_y - mr, moon_x + mr, moon_y + mr], fill=(244, 242, 248), outline=GRAY)
+    for cx_c, cy_c, cr in [(moon_x - 14, moon_y - 6, 6), (moon_x + 8, moon_y + 10, 4), (moon_x - 2, moon_y + 16, 5)]:
+        draw.ellipse([cx_c - cr, cy_c - cr, cx_c + cr, cy_c + cr], fill=(200, 200, 200))
+    floor_y = 296
+    draw.rectangle([0, floor_y, CANVAS, floor_y + 4], fill=DARK_GRAY)
+    for i in range(3):
+        tx = slide + 12 * g + i * 20
+        if tx < CANVAS - 20:
+            draw.rectangle([tx, floor_y - 8 - i * 2, tx + 14 - i * 2, floor_y - 4 - i * 2], fill=LIGHT_BLUE)
+    for i in range(4):
+        ang = (f * 25 + i * 90) * math.pi / 180
+        sx = slide + 4 * g + int(math.cos(ang) * 80)
+        sy = 200 + int(math.sin(ang) * 80)
+        draw_text(draw, "*", sx, sy, color=WHITE, scale=2)
+
+
+def sc_razzle_dazzling(draw, f, img):
+    """Clawd hits center stage in a spotlight as stars and confetti burst outward."""
+    cx, cy = 120, 175
+    draw_spotlight(draw, cx + 4 * g, 30, cy + 6 * g, top_w=20, bottom_w=150)
+    draw_clawd(draw, cx, cy, g, expression="cheeky", frame=f)
+    star_specs = [(60, 80), (340, 92), (78, 280), (332, 278), (210, 60), (200, 320)]
+    for i, (sx, sy) in enumerate(star_specs):
+        if (f + i) % 2 == 0:
+            draw_text(draw, "*", sx, sy + (f % 2) * 3, color=[YELLOW, PINK, TEAL, ORANGE, LIGHT_BLUE, PURPLE][i], scale=4)
+    for i in range(8):
+        rng = random.Random(f * 13 + i)
+        cx_c = rng.randint(30, CANVAS - 30)
+        cy_c = rng.randint(40, CANVAS - 60)
+        cc = [YELLOW, PINK, TEAL, ORANGE, LIGHT_BLUE][i % 5]
+        draw.rectangle([cx_c, cy_c, cx_c + 4, cy_c + 4], fill=cc)
+    for i in range(2):
+        bx = [70, 320][i]
+        by = cy + 3 * g + [0, 4, -2, 4, 0, 2][f]
+        draw.polygon([(bx, by), (bx + 14, by - 6), (bx + 22, by + 4), (bx + 8, by + 10)], fill=YELLOW, outline=ORANGE)
+
+
+def sc_sketching(draw, f, img):
+    """Clawd holds a pencil while strokes appear progressively on a sketchpad."""
+    cx, cy = 50, 178
+    draw_clawd(draw, cx, cy, g, frame=f)
+    pad_x, pad_y = 210, 140
+    pad_w, pad_h = 160, 130
+    draw.rectangle([pad_x, pad_y, pad_x + pad_w, pad_y + pad_h], fill=WHITE, outline=DARK_GRAY)
+    draw.rectangle([pad_x, pad_y, pad_x + pad_w, pad_y + 10], fill=DARK_GRAY)
+    for i in range(8):
+        rx = pad_x + 10 + i * (pad_w - 20) // 8
+        draw.rectangle([rx, pad_y + 2, rx + 4, pad_y + 8], fill=GRAY)
+    strokes = [
+        [(pad_x + 30, pad_y + 60), (pad_x + 70, pad_y + 40), (pad_x + 110, pad_y + 60)],
+        [(pad_x + 30, pad_y + 60), (pad_x + 30, pad_y + 110)],
+        [(pad_x + 30, pad_y + 110), (pad_x + 110, pad_y + 110)],
+        [(pad_x + 110, pad_y + 60), (pad_x + 110, pad_y + 110)],
+        [(pad_x + 70, pad_y + 40), (pad_x + 70, pad_y + 110)],
+        [(pad_x + 120, pad_y + 80), (pad_x + 140, pad_y + 70), (pad_x + 140, pad_y + 110)],
+    ]
+    for i, pts in enumerate(strokes):
+        if f >= i:
+            for j in range(len(pts) - 1):
+                draw.line([pts[j], pts[j + 1]], fill=BLACK, width=2)
+    pencil_tip_x = pad_x + 120 + [0, 4, -4, 6, -2, 0][f]
+    pencil_tip_y = pad_y + 60 + [0, 4, 8, 12, 8, 4][f]
+    draw.line([pencil_tip_x + 40, pencil_tip_y - 40, pencil_tip_x, pencil_tip_y], fill=YELLOW, width=4)
+    draw.line([pencil_tip_x, pencil_tip_y, pencil_tip_x - 6, pencil_tip_y + 6], fill=DARK_GRAY, width=3)
+
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 def main():
@@ -6804,7 +7147,7 @@ def main():
 
     # Compact scene generators rendered through make_frames().
     scene_generators = {
-        "Bebopping": sc_bebopping,
+        "Beboppin'": sc_beboppin,
         "Billowing": sc_billowing,
         "Bloviating": sc_bloviating,
         "Boogieing": sc_boogieing,
@@ -6898,6 +7241,23 @@ def main():
         "Sautéing": sc_sauteing,
         "Scampering": sc_scampering,
         "Caramelizing": sc_caramelizing,
+        # Catalog-alignment additions (official spinner verbs covered in a later pass).
+        "Architecting": sc_architecting,
+        "Calculating": sc_calculating,
+        "Computing": sc_computing,
+        "Creating": sc_creating,
+        "Drizzling": sc_drizzling,
+        "Garnishing": sc_garnishing,
+        "Generating": sc_generating,
+        "Moonwalking": sc_moonwalking,
+        "Orbiting": sc_orbiting,
+        "Photosynthesizing": sc_photosynthesizing,
+        "Processing": sc_processing,
+        "Razzle-dazzling": sc_razzle_dazzling,
+        "Sketching": sc_sketching,
+        "Thinking": sc_thinking,
+        "Whisking": sc_whisking,
+        "Working": sc_working,
     }
     # Normalize both generator styles into one output registry.
     for word, scene_fn in scene_generators.items():
