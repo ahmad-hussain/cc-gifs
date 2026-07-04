@@ -19,6 +19,29 @@ A creative playground for generating Clawd (Claude Code mascot) pixel art spinne
 - `.gitignore` — Excludes `generated/`, `*.gif`, `*.png`, `*.jpg`, `*.jpeg`, `.DS_Store`, `__pycache__/`
 - Local-only reference screenshots, reference GIFs, and sticker/source assets are intentionally excluded from this public repository
 
+## Setup (fresh machine, incl. companion)
+
+To stand the whole thing up on a new **macOS** machine — GIFs plus the per-session working-companion beacon — the one-shot installer does everything:
+
+```bash
+./companion/install.sh --install-hooks
+```
+
+This builds `companion/.venv` (system `/usr/bin/python3` + PyObjC, required for AppKit), installs `Pillow` + `pyobjc-framework-Cocoa`, generates all GIFs into `generated/` (git-ignored), and merges the four hooks into `~/.claude/settings.json` (timestamped backup first; idempotent; preserves existing hooks). Then **restart Claude Code**. Omit `--install-hooks` to print the hook JSON for manual merging instead.
+
+Manual equivalent (what the installer automates):
+1. `/usr/bin/python3 -m venv companion/.venv` — system python is required for GUI/AppKit access
+2. `companion/.venv/bin/python3 -m pip install -r requirements.txt -r companion/requirements.txt`
+3. `companion/.venv/bin/python3 generate_clawd_gifs.py`
+4. Add four `async` hooks to `~/.claude/settings.json`, each pointing at the **absolute** path of the script (the scripts self-resolve their own dir, so only these command paths matter):
+   - `UserPromptSubmit` → `companion/show.sh` (mark session working)
+   - `PreToolUse` → `companion/resume.sh` (flip waiting→working when Claude resumes after a mid-turn block)
+   - `Notification` → `companion/notify.sh` (needs-your-input → waving mascot)
+   - `Stop` → `companion/hide.sh` (turn done → remove the mascot)
+5. Restart Claude Code so the hooks load.
+
+GIFs only (any OS, no companion): `pip install -r requirements.txt` then `python3 generate_clawd_gifs.py`. Full companion details are in `companion/README.md`.
+
 ## GIF Generation
 
 ```bash

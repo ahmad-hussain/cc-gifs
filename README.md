@@ -16,6 +16,7 @@ This repository is an unofficial technical/art experiment. The code in this repo
 - `spinner-words.md`: the catalog of 195 spinner entries (195 drawn, 0 pending) with Chinese translations, scene descriptions, and an "官方语义" column noting the upstream verb's intent
 - `CLAUDE.md` and `AGENTS.md`: working notes and agent-facing repository instructions
 - `requirements.txt`: minimal runtime dependency list
+- `companion/`: optional macOS "working companion" — a per-session Clawd status beacon (see [companion/README.md](./companion/README.md))
 - `LICENSE`: MIT license for repository code
 
 ## What’s Not Included
@@ -48,6 +49,20 @@ generated/Clawd-{Word}.gif
 
 The generator currently draws **195 spinner scenes** (186 official Claude Code spinner verbs + 9 repo extensions) — every official verb from Claude Code `2.1.201` is covered — plus **1 companion-only asset** (`Clawd-_Waiting.gif`, a "needs your input" mascot used by the optional macOS companion, see `companion/`). Most compact scenes render as 6-frame loops at 170ms per frame, while some handcrafted scenes use longer timelines.
 
+## Working Companion (macOS)
+
+`companion/` is an optional macOS **status beacon**: while a Claude Code session is working, a Clawd mascot floats in the bottom-right corner (over other apps and fullscreen Spaces). It waves with a red `!` when Claude needs your input, and disappears when the turn ends. Multiple concurrent sessions stack into a tray, each tagged with its session name (`/rename` value). See [companion/README.md](./companion/README.md).
+
+**Setup (one command):**
+
+```bash
+./companion/install.sh --install-hooks   # build venv, generate GIFs, and merge the hooks into ~/.claude/settings.json (backed up first)
+# ...or review first — this prints the hook JSON to add by hand instead:
+./companion/install.sh
+```
+
+Then restart Claude Code. The installer builds `companion/.venv` (PyObjC), generates the GIFs, and wires four hooks — `UserPromptSubmit` (working), `PreToolUse` (resume), `Notification` (needs input), `Stop` (done). macOS only; the generator itself is cross-platform.
+
 ## Project Structure
 
 ```text
@@ -60,7 +75,8 @@ The generator currently draws **195 spinner scenes** (186 official Claude Code s
 ├── generate_clawd_gifs.py
 ├── requirements.txt
 ├── spinner-words.md
-└── generated/   # runtime output, ignored by git
+├── companion/    # optional macOS working-companion tray (.venv ignored by git)
+└── generated/    # runtime output, ignored by git
 ```
 
 ## Notes on the Generator
