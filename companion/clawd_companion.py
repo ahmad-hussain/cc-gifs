@@ -53,6 +53,8 @@ MARGIN_BOTTOM = 12
 OPACITY = 0.65       # 0.0–1.0 overall opacity of each mascot (incl. its name tag); 1.0 = fully solid
 POLL = 0.25
 IDLE_QUIT = 180  # daemon quits after this many seconds with zero active sessions
+STALE_SECS = 90  # prune a headless (claude -p / SDK) session's mascot after this
+                 # long without an update — those never fire Stop to remove it
 
 _ADJ = ["brave", "calm", "clever", "cozy", "eager", "fuzzy", "jolly", "lucky",
         "mellow", "nimble", "plucky", "snug", "sunny", "witty", "zesty", "brisk",
@@ -122,6 +124,22 @@ def _session_name(sid):
     return name
 
 
+def _interactive_sids():
+    """Session ids Claude Code tracks as interactive in ~/.claude/sessions. Headless
+    (`claude -p`) / SDK sessions — e.g. a Slack bridge — aren't listed there, so we
+    skip their mascots entirely (they reply through their own channel, and never
+    fire Stop to clean up)."""
+    sids = set()
+    for p in glob.glob(os.path.expanduser("~/.claude/sessions/*.json")):
+        try:
+            o = json.load(open(p))
+            if o.get("kind") == "interactive":
+                sids.add(o.get("sessionId"))
+        except Exception:
+            pass
+    return sids
+
+
 def _pick_gif():
     # Underscore-prefixed files (e.g. Clawd-_Waiting.gif) are special companion
     # assets, not spinner scenes — keep them out of the random working pool.
@@ -169,6 +187,8 @@ def _ensure_daemon():
 def cmd_show(data):
     _ensure_dirs()
     sid = _session_id(data)
+    if sid not in _interactive_sids():
+        return  # headless / SDK session (not interactive) → no mascot at all
     gif = _pick_gif()
     if not gif:
         return
@@ -313,6 +333,8 @@ def cmd_daemon():
                 files = [f for f in os.listdir(SESS_DIR) if f.endswith(".json")]
             except FileNotFoundError:
                 files = []
+            inter = _interactive_sids()
+            now = time.time()
             desired = {}
             for fn in files:
                 p = os.path.join(SESS_DIR, fn)
@@ -321,7 +343,16 @@ def cmd_daemon():
                     mt = os.path.getmtime(p)
                 except Exception:
                     continue
-                desired[rec.get("sid") or fn[:-5]] = (rec, mt)
+                sid = rec.get("sid") or fn[:-5]
+                # Prune headless/SDK ghosts (not interactive-registered) once stale —
+                # they never fire Stop to remove themselves.
+                if sid not in inter and (now - mt) > STALE_SECS:
+                    try:
+                        os.remove(p)
+                    except OSError:
+                        pass
+                    continue
+                desired[sid] = (rec, mt)
 
             for sid in list(self.cells):
                 if sid not in desired:
