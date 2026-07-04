@@ -10,7 +10,7 @@ A creative playground for generating Clawd (Claude Code mascot) pixel art spinne
 
 - `generate_clawd_gifs.py` — Unified generator script: draws Clawd pixel art, defines both full `frames_*()` animations and compact `sc_*()` scenes, and outputs transparent GIFs
 - `generated/` — Runtime output directory for generated GIFs (kept out of git)
-- `spinner-words.md` — Catalog of `195` spinner entries (`195` drawn ✅, `0` pending ⏳, `9` repo extensions ★) with status tracking, Chinese translations, scene descriptions, and an "官方语义" column noting upstream verb intent. Cross-checked against Claude Code `2.1.201`'s 186 default `spinnerVerbs` — all 186 official verbs now have GIFs.
+- `spinner-words.md` — Catalog of `195` spinner entries (`195` drawn ✅, `0` pending ⏳, `9` repo extensions ★) with status tracking and a short description per verb. Cross-checked against Claude Code `2.1.201`'s 186 default `spinnerVerbs` — all 186 official verbs now have GIFs.
 - `companion/` — macOS "working companion": a per-session status-beacon tray that shows a Clawd mascot for each active Claude Code session (via `UserPromptSubmit`/`Notification`/`Stop` hooks). See `companion/README.md`. `clawd_companion.py` (daemon + hook subcommands), `show.sh`/`notify.sh`/`hide.sh`, `requirements.txt` (PyObjC); `.venv/` is git-ignored
 - `README.md` — Public repo overview and usage guide
 - `AGENTS.md` — Pointer file for Codex and other coding agents, redirects to `CLAUDE.md`

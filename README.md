@@ -2,18 +2,14 @@
 
 Pixel-art spinner GIF generator for Clawd, the Claude Code mascot.
 
-这是一个围绕 Clawd 的像素风加载动图生成器仓库，重点公开的是 Python 生成脚本、词表和文档，不包含本地参考图与导出的 GIF 成品。
-
 ## Disclaimer
 
 This repository is an unofficial technical/art experiment. The code in this repository is released under the MIT License, but `Claude`, `Claude Code`, `Clawd`, and related mascot or brand imagery remain the intellectual property and/or trademarks of Anthropic. The MIT license here applies to the repository code only and does not grant rights to Anthropic branding or character assets. Generated mascot imagery should be treated as learning/showcase material unless you have separate permission for other uses.
 
-本仓库开源的是代码，不是 Anthropic 的品牌或角色授权。
-
 ## What’s Included
 
 - `generate_clawd_gifs.py`: the unified generator for all official Clawd spinner scenes
-- `spinner-words.md`: the catalog of 195 spinner entries (195 drawn, 0 pending) with Chinese translations, scene descriptions, and an "官方语义" column noting the upstream verb's intent
+- `spinner-words.md`: the catalog of 195 spinner entries (195 drawn, 0 pending) with a short description and status per verb
 - `CLAUDE.md` and `AGENTS.md`: working notes and agent-facing repository instructions
 - `requirements.txt`: minimal runtime dependency list
 - `companion/`: optional macOS "working companion" — a per-session Clawd status beacon (see [companion/README.md](./companion/README.md))
@@ -96,8 +92,7 @@ The full word list lives in [spinner-words.md](./spinner-words.md).
 It includes:
 
 - official word numbering
-- Chinese translations
-- scene descriptions
+- a short description per verb
 - generation status tracking
 
 ### Catalog Scope
