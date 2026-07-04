@@ -10,7 +10,8 @@ A creative playground for generating Clawd (Claude Code mascot) pixel art spinne
 
 - `generate_clawd_gifs.py` — Unified generator script: draws Clawd pixel art, defines both full `frames_*()` animations and compact `sc_*()` scenes, and outputs transparent GIFs
 - `generated/` — Runtime output directory for generated GIFs (kept out of git)
-- `spinner-words.md` — Catalog of `195` spinner entries (`165` drawn ✅, `30` pending ⏳, `8` repo extensions ★) with status tracking, Chinese translations, scene descriptions, and an "官方语义" column noting upstream verb intent. Cross-checked against Claude Code `2.1.153`'s 187 default `spinnerVerbs`.
+- `spinner-words.md` — Catalog of `195` spinner entries (`195` drawn ✅, `0` pending ⏳, `9` repo extensions ★) with status tracking, Chinese translations, scene descriptions, and an "官方语义" column noting upstream verb intent. Cross-checked against Claude Code `2.1.201`'s 186 default `spinnerVerbs` — all 186 official verbs now have GIFs.
+- `companion/` — macOS "working companion": a per-session status-beacon tray that shows a Clawd mascot for each active Claude Code session (via `UserPromptSubmit`/`Notification`/`Stop` hooks). See `companion/README.md`. `clawd_companion.py` (daemon + hook subcommands), `show.sh`/`notify.sh`/`hide.sh`, `requirements.txt` (PyObjC); `.venv/` is git-ignored
 - `README.md` — Public repo overview and usage guide
 - `AGENTS.md` — Pointer file for Codex and other coding agents, redirects to `CLAUDE.md`
 - `requirements.txt` — Minimal runtime dependency list (`Pillow`)
@@ -47,7 +48,7 @@ python3 generate_clawd_gifs.py
   - `Transmuting` — `8` frames
   - `Tinkering` — `8` frames
   - `Thundering` — `8` frames
-- The generator currently produces `165` GIFs (`157` official spinner verbs + `8` repo extensions); `30` additional official verbs are catalogued as pending in `spinner-words.md`
+- The generator currently produces `195` spinner GIFs (`186` official spinner verbs + `9` repo extensions) plus `1` companion-only asset (`Clawd-_Waiting.gif`, the underscore-prefixed "needs your input" mascot excluded from the random pool); all official verbs from Claude Code `2.1.201` are now covered (`0` pending)
 - `generate_clawd_gifs.py` supports two internal scene styles:
   - handcrafted `frames_*()` functions that return complete frame lists
   - compact `sc_*()` scene functions rendered through `make_frames()`
