@@ -50,6 +50,7 @@ TAG_H = 14           # extra height above the mascot for the name tag (which res
 GAP = 10
 MARGIN_RIGHT = 16
 MARGIN_BOTTOM = 12
+OPACITY = 0.65       # 0.0–1.0 overall opacity of each mascot (incl. its name tag); 1.0 = fully solid
 POLL = 0.25
 IDLE_QUIT = 180  # daemon quits after this many seconds with zero active sessions
 
@@ -273,6 +274,7 @@ def cmd_daemon():
         panel.setOpaque_(False)
         panel.setBackgroundColor_(NSColor.clearColor())
         panel.setHasShadow_(False)
+        panel.setAlphaValue_(OPACITY)
         panel.setIgnoresMouseEvents_(True)
         panel.setFloatingPanel_(True)
         panel.setBecomesKeyOnlyIfNeeded_(True)
