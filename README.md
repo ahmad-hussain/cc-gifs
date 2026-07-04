@@ -64,18 +64,22 @@ The generator currently draws **195 spinner scenes** (186 official Claude Code s
 
 ## Working Companion (macOS)
 
-`companion/` is an optional macOS **status beacon**: while a Claude Code session is working, a Clawd mascot floats in the bottom-right corner (over other apps and fullscreen Spaces). It waves with a red `!` when Claude needs your input, and disappears when the turn ends. Multiple concurrent sessions stack into a tray, each tagged with its session name (`/rename` value). See [companion/README.md](./companion/README.md).
+`companion/` is an optional macOS **status beacon** with three mix-and-match cues for "Claude is working / needs your input / done":
 
-**Setup (one command):**
+1. **Visual tray** — a Clawd mascot per session in the bottom-right corner (over other apps and fullscreen Spaces); it waves with a red `!` when Claude needs your input, and disappears when the turn ends. Concurrent sessions stack into a tray, each tagged with its session name (`/rename` value).
+2. **Sound cues** — a chime on done / needs-input.
+3. **Banner notifications** — a native macOS banner (with a custom icon) on done / needs-input.
+
+**Setup:** run the installer and follow the prompts — it previews the cues, then lets you enable any mix of the three:
 
 ```bash
-./companion/install.sh --install-hooks               # build venv, generate GIFs, merge hooks into ~/.claude/settings.json (backed up first)
-./companion/install.sh --install-hooks --with-sound   # ...plus optional done/needs-input system sounds (Glass/Funk, editable in chime.sh)
-# ...or review first — this prints the hook JSON to add by hand instead:
-./companion/install.sh
+./companion/install.sh                       # interactive: preview, then choose cues
+# non-interactive (scripts / agents):
+./companion/install.sh --install-hooks [--no-tray] [--with-sound] [--with-banner]
+./companion/install.sh --print [flags]       # print the hook JSON instead of merging
 ```
 
-Then restart Claude Code. The installer builds `companion/.venv` (PyObjC), generates the GIFs, and wires five hooks — `UserPromptSubmit` (working), `PreToolUse`/`PostToolUse` (resume after you answer), `Notification` (needs input), `Stop` (done). macOS only; the generator itself is cross-platform. Sound is **opt-in** via `--with-sound` (off by default, so it won't double any audio hooks you already have); a native macOS banner is also possible — see `companion/README.md`.
+Then restart Claude Code. Sound (`--with-sound`) and banner (`--with-banner`) are **opt-in and independent**, so they won't double any audio/notification hooks you already have. Banners show a custom icon via `terminal-notifier` (`brew install terminal-notifier`; drop your own PNG at `companion/banner-icon.png`). macOS only; the generator itself is cross-platform. See [companion/README.md](./companion/README.md).
 
 ## Project Structure
 

@@ -42,12 +42,18 @@ from `~/.claude/sessions/*.json` by `session_id`), or a stable random name like
 - `clawd_companion.py` — subcommands `show | notify | hide | daemon | preview`.
 - `show.sh` / `notify.sh` / `resume.sh` / `hide.sh` — thin hook wrappers (derive
   their own dir, pass stdin through, always `exit 0` so they can never stall a turn).
-- `install.sh` — one-shot setup (venv + deps + generate GIFs + optional hook merge).
-  `--with-sound` also wires the audio cues below.
+- `install.sh` — setup. Run with no flags for an **interactive** flow (preview,
+  then pick any mix of the three cues); or use flags (`--install-hooks` /
+  `--print`, plus `--no-tray` / `--with-sound` / `--with-banner`) for scripts/agents.
 - `chime.sh` — **optional** macOS sound cue (`done` / `needs-input`) via `afplay`,
-  off by default and wired only by `install.sh --with-sound`. The two sounds
-  (Glass / Funk) are editable at the top of the file; any `/System/Library/Sounds/`
-  name works. (macOS native banners are also possible — see the note below.)
+  wired only by `--with-sound`. The two sounds (Glass / Funk) are editable at the
+  top of the file; any `/System/Library/Sounds/` name works.
+- `notify-banner.sh` — **optional** native macOS banner (`done` / `needs-input`),
+  wired only by `--with-banner`. Uses `terminal-notifier` (shows a custom icon)
+  when installed, else falls back to `osascript`. Visual only — no sound.
+- `banner-icon.png` *(optional, local)* — a custom icon for the banner. If present
+  it overrides the generated default `../generated/clawd-icon.png`. Git-ignored
+  (drop in any PNG).
 - `.venv/` — one-time venv from `/usr/bin/python3` + `pyobjc-framework-Cocoa`.
   Git-ignored.
 - The waiting mascot is a companion-only asset generated as
@@ -56,27 +62,29 @@ from `~/.claude/sessions/*.json` by `session_id`), or a stable random name like
 
 ## Setup
 
+Easiest — run the installer and follow the prompts (it previews the cues, lets
+you pick any mix of tray / sound / banner, builds the venv, generates the GIFs,
+and merges the chosen hooks into `~/.claude/settings.json` with a backup):
+
 ```sh
-/usr/bin/python3 -m venv companion/.venv
-companion/.venv/bin/python3 -m pip install -r companion/requirements.txt
+./companion/install.sh
 ```
 
-Then add to `~/.claude/settings.json` (absolute paths; `async`):
+Non-interactive (scripts / agents):
 
-```json
-{
-  "hooks": {
-    "UserPromptSubmit": [ { "hooks": [ { "type": "command", "command": "~/Documents/cc-gifs/companion/show.sh",   "async": true } ] } ],
-    "PreToolUse":       [ { "hooks": [ { "type": "command", "command": "~/Documents/cc-gifs/companion/resume.sh", "async": true } ] } ],
-    "PostToolUse":      [ { "hooks": [ { "type": "command", "command": "~/Documents/cc-gifs/companion/resume.sh", "async": true } ] } ],
-    "Notification":     [ { "hooks": [ { "type": "command", "command": "~/Documents/cc-gifs/companion/notify.sh", "async": true } ] } ],
-    "Stop":             [ { "hooks": [ { "type": "command", "command": "~/Documents/cc-gifs/companion/hide.sh",   "async": true } ] } ]
-  }
-}
+```sh
+./companion/install.sh --install-hooks                 # tray only (default)
+./companion/install.sh --install-hooks --with-sound    # tray + sound
+./companion/install.sh --install-hooks --with-banner   # tray + banner
+./companion/install.sh --install-hooks --no-tray --with-sound --with-banner
+./companion/install.sh --print [flags]                 # print the hook JSON instead of merging
 ```
 
-Restart Claude Code (or `/hooks`) so the hooks load. New sessions pick it up
-automatically. Preview a specific scene without hooks:
+Restart Claude Code (or `/hooks`) afterward so the hooks load; new sessions pick
+it up automatically. The tray uses these five hooks — `UserPromptSubmit`→`show.sh`,
+`PreToolUse`/`PostToolUse`→`resume.sh`, `Notification`→`notify.sh`, `Stop`→`hide.sh`;
+`--with-sound` adds `chime.sh` and `--with-banner` adds `notify-banner.sh` on
+`Notification` (needs-input) and `Stop` (done). Preview one scene without hooks:
 `companion/.venv/bin/python3 companion/clawd_companion.py preview Clawd-_Waiting.gif "demo"`
 
 ## Tuning
@@ -89,13 +97,14 @@ automatically. Preview a specific scene without hooks:
 
 - macOS only (uses AppKit). The generator itself only needs Pillow and is
   cross-platform; only this companion is macOS-specific.
-- **Native banners (alternative to sound):** for a Notification Center banner
-  instead of / on top of a chime, either enable Claude Code's own notifications
-  (`inputNeededNotifEnabled` / `agentPushNotifEnabled` in settings, plus grant
-  Ghostty notification permission in System Settings), or add an `osascript -e
-  'display notification "…" with title "…" sound name "…"'` command to a Stop /
-  Notification hook (works cross-focus and can carry a sound). Not wired by
-  default; the built-in cue here is the visual tray plus the optional `chime.sh`.
+- **Banner icon:** `notify-banner.sh` shows a custom icon only via
+  `terminal-notifier` (`brew install terminal-notifier`); with plain `osascript`
+  the banner uses the "Script Editor" icon (the icon can't be changed). Drop a
+  PNG at `companion/banner-icon.png` to use your own, else the generated
+  `generated/clawd-icon.png` is used.
+- **Claude Code's own notifications** are a separate, built-in option: enable
+  `inputNeededNotifEnabled` / `agentPushNotifEnabled` in settings and grant Ghostty
+  notification permission (System Settings → Notifications → Ghostty).
 - **Trust model:** these scripts are wired into your *global* Claude Code config
   and run on every prompt/stop, so anyone who can edit them gets code execution
   on every turn. Keep `clawd_companion.py` / `*.sh` write-protected and re-audit

@@ -7679,6 +7679,18 @@ def sc_zigzagging(draw, f, img):
         draw.line([cx - 30 - i * 10, ly, cx, ly], fill=GRAY, width=2)
 
 
+def save_clawd_icon(path, size=256, g=20):
+    """Render a standalone transparent Clawd for the companion's banner icon
+    (used by notify-banner.sh; a repo default that a local companion/banner-icon.png
+    can override). Not a spinner asset."""
+    img = Image.new('RGBA', (size, size), TRANS)
+    draw = ImageDraw.Draw(img)
+    ox = size // 2 - 4 * g
+    oy = (size - 8 * g) // 2
+    draw_clawd(draw, ox, oy, g, frame=0)
+    img.save(path)
+
+
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
@@ -7903,6 +7915,8 @@ def main():
         frames = gen_func()
         save_gif(frames, filename)
 
+    save_clawd_icon(os.path.join(out_dir, "clawd-icon.png"))
+    print("  Generated clawd-icon.png (companion banner icon)")
     print("Done! All GIFs generated.")
 
 

@@ -11,7 +11,7 @@ A creative playground for generating Clawd (Claude Code mascot) pixel art spinne
 - `generate_clawd_gifs.py` — Unified generator script: draws Clawd pixel art, defines both full `frames_*()` animations and compact `sc_*()` scenes, and outputs transparent GIFs
 - `generated/` — Runtime output directory for generated GIFs (kept out of git)
 - `spinner-words.md` — Catalog of `195` spinner entries (`195` drawn ✅, `0` pending ⏳, `9` repo extensions ★) with status tracking and a short description per verb. Cross-checked against Claude Code `2.1.201`'s 186 default `spinnerVerbs` — all 186 official verbs now have GIFs.
-- `companion/` — macOS "working companion": a per-session status-beacon tray that shows a Clawd mascot for each active Claude Code session (via `UserPromptSubmit`/`Notification`/`Stop` hooks). See `companion/README.md`. `clawd_companion.py` (daemon + hook subcommands), `show.sh`/`notify.sh`/`hide.sh`, `requirements.txt` (PyObjC); `.venv/` is git-ignored
+- `companion/` — macOS "working companion" with three mix-and-match cues: a per-session **visual tray** (Clawd mascot per session), optional **sound cues**, and optional **native banner** notifications. See `companion/README.md`. `clawd_companion.py` (daemon + `show`/`notify`/`hide`/`resume`/`preview` subcommands), the hook wrappers `show.sh`/`resume.sh`/`notify.sh`/`hide.sh` (tray), `chime.sh` (sound), `notify-banner.sh` (banner), `install.sh` (interactive/flag setup), `requirements.txt` (PyObjC). `.venv/`, `banner-icon.png`, and `../generated/clawd-icon.png` are git-ignored (local)
 - `README.md` — Public repo overview and usage guide
 - `AGENTS.md` — Pointer file for Codex and other coding agents, redirects to `CLAUDE.md`
 - `requirements.txt` — Minimal runtime dependency list (`Pillow`)
@@ -29,7 +29,9 @@ To stand the whole thing up on a new **macOS** machine — GIFs plus the per-ses
 ./companion/install.sh --install-hooks
 ```
 
-This builds `companion/.venv` (system `/usr/bin/python3` + PyObjC, required for AppKit), installs `Pillow` + `pyobjc-framework-Cocoa`, generates all GIFs into `generated/` (git-ignored), and merges the five hooks into `~/.claude/settings.json` (timestamped backup first; idempotent; preserves existing hooks). Then **restart Claude Code**. Omit `--install-hooks` to print the hook JSON for manual merging instead. Add `--with-sound` to also wire optional done/needs-input system sounds via `companion/chime.sh` (Glass/Funk defaults, editable; off by default so it won't double existing audio hooks).
+This builds `companion/.venv` (system `/usr/bin/python3` + PyObjC, required for AppKit), installs `Pillow` + `pyobjc-framework-Cocoa`, generates all GIFs into `generated/` (git-ignored), and merges the five tray hooks into `~/.claude/settings.json` (timestamped backup first; idempotent; preserves existing hooks). Then **restart Claude Code**.
+
+Flags: run with **no flags** for an interactive flow (preview, then pick any mix of the three cues); `--print` prints the hook JSON instead of merging; `--no-tray` omits the visual tray; `--with-sound` adds `companion/chime.sh` (Glass/Funk chime, editable); `--with-banner` adds `companion/notify-banner.sh` (native macOS banner — custom icon via `terminal-notifier`, else `osascript`). Sound and banner are opt-in and independent, so they won't double existing audio/notification hooks.
 
 Manual equivalent (what the installer automates):
 1. `/usr/bin/python3 -m venv companion/.venv` — system python is required for GUI/AppKit access
@@ -41,6 +43,8 @@ Manual equivalent (what the installer automates):
    - `PostToolUse` → `companion/resume.sh` (flip waiting→working the instant `AskUserQuestion` returns — covers answer-then-text-only turns)
    - `Notification` → `companion/notify.sh` (needs-your-input → waving mascot)
    - `Stop` → `companion/hide.sh` (turn done → remove the mascot)
+   - *(optional sound)* `Notification` → `companion/chime.sh needs-input`, `Stop` → `companion/chime.sh done`
+   - *(optional banner)* `Notification` → `companion/notify-banner.sh needs-input`, `Stop` → `companion/notify-banner.sh done`
 5. Restart Claude Code so the hooks load.
 
 GIFs only (any OS, no companion): `pip install -r requirements.txt` then `python3 generate_clawd_gifs.py`. Full companion details are in `companion/README.md`.
