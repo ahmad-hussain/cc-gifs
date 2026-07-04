@@ -3,6 +3,7 @@
 #
 #   ./companion/install.sh                 # venv + deps + generate GIFs, then PRINT the hooks to add
 #   ./companion/install.sh --install-hooks # also merge the hooks into ~/.claude/settings.json (backup first)
+#   ./companion/install.sh --install-hooks --with-sound   # ...and add optional done/needs-input system sounds
 #
 # Safe to re-run: the venv/deps/hook-merge steps are idempotent. Restart Claude
 # Code afterward so the hooks load.
@@ -37,23 +38,38 @@ echo "==> generating GIFs"
 "$VENV/bin/python3" "$REPO/generate_clawd_gifs.py" >/dev/null
 echo "    $(ls "$REPO/generated"/Clawd-*.gif | wc -l | tr -d ' ') GIFs in $REPO/generated"
 
-# 3. hooks — print, or (with --install-hooks) merge into ~/.claude/settings.json
-MODE="print"
-[ "$1" = "--install-hooks" ] && MODE="merge"
+# 3. hooks — print, or (with --install-hooks) merge into ~/.claude/settings.json.
+#    --with-sound also wires optional done/needs-input system-sound cues (chime.sh).
+MODE="print"; SOUND="0"
+for a in "$@"; do
+  case "$a" in
+    --install-hooks) MODE="merge" ;;
+    --with-sound)    SOUND="1" ;;
+  esac
+done
 
-"$VENV/bin/python3" - "$COMPANION" "$MODE" <<'PYEOF'
+"$VENV/bin/python3" - "$COMPANION" "$MODE" "$SOUND" <<'PYEOF'
 import json, os, shutil, sys, time
 
 companion, mode = sys.argv[1], sys.argv[2]
-EVENTS = [("UserPromptSubmit", "show.sh"), ("PreToolUse", "resume.sh"),
-          ("PostToolUse", "resume.sh"), ("Notification", "notify.sh"),
-          ("Stop", "hide.sh")]
+sound = len(sys.argv) > 3 and sys.argv[3] == "1"
+EVENTS = [("UserPromptSubmit", "show.sh", ""), ("PreToolUse", "resume.sh", ""),
+          ("PostToolUse", "resume.sh", ""), ("Notification", "notify.sh", ""),
+          ("Stop", "hide.sh", "")]
+if sound:
+    EVENTS += [("Notification", "chime.sh", "needs-input"), ("Stop", "chime.sh", "done")]
 
-def entry(script):
-    return {"type": "command", "command": os.path.join(companion, script), "async": True}
+def command(script, arg):
+    c = os.path.join(companion, script)
+    return c + (" " + arg if arg else "")
+
+def entry(script, arg):
+    return {"type": "command", "command": command(script, arg), "async": True}
 
 if mode == "print":
-    hooks = {ev: [{"hooks": [entry(s)]}] for ev, s in EVENTS}
+    hooks = {}
+    for ev, script, arg in EVENTS:
+        hooks.setdefault(ev, []).append({"hooks": [entry(script, arg)]})
     print("\n==> Add these to the \"hooks\" object in ~/.claude/settings.json")
     print("    (merge into any existing hooks; then restart Claude Code):\n")
     print(json.dumps({"hooks": hooks}, indent=2))
@@ -72,11 +88,11 @@ else:
         print(f"==> backed up settings to {bak}")
     hooks = settings.setdefault("hooks", {})
     added = 0
-    for ev, script in EVENTS:
-        cmd = os.path.join(companion, script)
+    for ev, script, arg in EVENTS:
+        cmd = command(script, arg)
         arr = hooks.setdefault(ev, [])
         if not any(cmd in json.dumps(m) for m in arr):
-            arr.append({"hooks": [entry(script)]})
+            arr.append({"hooks": [entry(script, arg)]})
             added += 1
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w") as f:

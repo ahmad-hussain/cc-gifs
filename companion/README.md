@@ -42,6 +42,12 @@ from `~/.claude/sessions/*.json` by `session_id`), or a stable random name like
 - `clawd_companion.py` — subcommands `show | notify | hide | daemon | preview`.
 - `show.sh` / `notify.sh` / `resume.sh` / `hide.sh` — thin hook wrappers (derive
   their own dir, pass stdin through, always `exit 0` so they can never stall a turn).
+- `install.sh` — one-shot setup (venv + deps + generate GIFs + optional hook merge).
+  `--with-sound` also wires the audio cues below.
+- `chime.sh` — **optional** macOS sound cue (`done` / `needs-input`) via `afplay`,
+  off by default and wired only by `install.sh --with-sound`. The two sounds
+  (Glass / Funk) are editable at the top of the file; any `/System/Library/Sounds/`
+  name works. (macOS native banners are also possible — see the note below.)
 - `.venv/` — one-time venv from `/usr/bin/python3` + `pyobjc-framework-Cocoa`.
   Git-ignored.
 - The waiting mascot is a companion-only asset generated as
@@ -83,6 +89,13 @@ automatically. Preview a specific scene without hooks:
 
 - macOS only (uses AppKit). The generator itself only needs Pillow and is
   cross-platform; only this companion is macOS-specific.
+- **Native banners (alternative to sound):** for a Notification Center banner
+  instead of / on top of a chime, either enable Claude Code's own notifications
+  (`inputNeededNotifEnabled` / `agentPushNotifEnabled` in settings, plus grant
+  Ghostty notification permission in System Settings), or add an `osascript -e
+  'display notification "…" with title "…" sound name "…"'` command to a Stop /
+  Notification hook (works cross-focus and can carry a sound). Not wired by
+  default; the built-in cue here is the visual tray plus the optional `chime.sh`.
 - **Trust model:** these scripts are wired into your *global* Claude Code config
   and run on every prompt/stop, so anyone who can edit them gets code execution
   on every turn. Keep `clawd_companion.py` / `*.sh` write-protected and re-audit

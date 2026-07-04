@@ -27,7 +27,7 @@ To stand the whole thing up on a new **macOS** machine — GIFs plus the per-ses
 ./companion/install.sh --install-hooks
 ```
 
-This builds `companion/.venv` (system `/usr/bin/python3` + PyObjC, required for AppKit), installs `Pillow` + `pyobjc-framework-Cocoa`, generates all GIFs into `generated/` (git-ignored), and merges the five hooks into `~/.claude/settings.json` (timestamped backup first; idempotent; preserves existing hooks). Then **restart Claude Code**. Omit `--install-hooks` to print the hook JSON for manual merging instead.
+This builds `companion/.venv` (system `/usr/bin/python3` + PyObjC, required for AppKit), installs `Pillow` + `pyobjc-framework-Cocoa`, generates all GIFs into `generated/` (git-ignored), and merges the five hooks into `~/.claude/settings.json` (timestamped backup first; idempotent; preserves existing hooks). Then **restart Claude Code**. Omit `--install-hooks` to print the hook JSON for manual merging instead. Add `--with-sound` to also wire optional done/needs-input system sounds via `companion/chime.sh` (Glass/Funk defaults, editable; off by default so it won't double existing audio hooks).
 
 Manual equivalent (what the installer automates):
 1. `/usr/bin/python3 -m venv companion/.venv` — system python is required for GUI/AppKit access

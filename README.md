@@ -52,12 +52,13 @@ The generator currently draws **195 spinner scenes** (186 official Claude Code s
 **Setup (one command):**
 
 ```bash
-./companion/install.sh --install-hooks   # build venv, generate GIFs, and merge the hooks into ~/.claude/settings.json (backed up first)
+./companion/install.sh --install-hooks               # build venv, generate GIFs, merge hooks into ~/.claude/settings.json (backed up first)
+./companion/install.sh --install-hooks --with-sound   # ...plus optional done/needs-input system sounds (Glass/Funk, editable in chime.sh)
 # ...or review first — this prints the hook JSON to add by hand instead:
 ./companion/install.sh
 ```
 
-Then restart Claude Code. The installer builds `companion/.venv` (PyObjC), generates the GIFs, and wires five hooks — `UserPromptSubmit` (working), `PreToolUse`/`PostToolUse` (resume after you answer), `Notification` (needs input), `Stop` (done). macOS only; the generator itself is cross-platform.
+Then restart Claude Code. The installer builds `companion/.venv` (PyObjC), generates the GIFs, and wires five hooks — `UserPromptSubmit` (working), `PreToolUse`/`PostToolUse` (resume after you answer), `Notification` (needs input), `Stop` (done). macOS only; the generator itself is cross-platform. Sound is **opt-in** via `--with-sound` (off by default, so it won't double any audio hooks you already have); a native macOS banner is also possible — see `companion/README.md`.
 
 ## Project Structure
 
