@@ -1,0 +1,5 @@
+# Clawd working-companion window (macOS only).
+# Native AppKit floating panel via PyObjC. Install into companion/.venv:
+#   /usr/bin/python3 -m venv companion/.venv
+#   companion/.venv/bin/python3 -m pip install -r companion/requirements.txt
+pyobjc-framework-Cocoa>=10
