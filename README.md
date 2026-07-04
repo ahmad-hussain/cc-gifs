@@ -1,4 +1,4 @@
-# cc-gifs
+# clawd-spinner-gifs
 
 Pixel-art spinner GIF generator for Clawd, the Claude Code mascot.
 
@@ -28,7 +28,7 @@ Those files are intentionally ignored in git so this public repo stays lightweig
 **Full setup (macOS — GIFs + working companion), one command:**
 
 ```bash
-git clone git@github.com:ahmad-hussain/cc-gifs.git ~/Documents/cc-gifs
+git clone git@github.com:ahmad-hussain/clawd-spinner-gifs.git ~/Documents/cc-gifs
 cd ~/Documents/cc-gifs
 ./companion/install.sh --install-hooks    # builds the venv, generates the GIFs, wires the companion hooks
 #                              --with-sound  # (optional) also add done / needs-input system sounds
