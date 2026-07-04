@@ -46,6 +46,7 @@ NAME_MAX = 20  # display name truncation
 
 # tray layout (px)
 SIZE = 135
+TAG_H = 14           # extra height above the mascot for the name tag (which rests on the frame's top edge)
 GAP = 10
 MARGIN_RIGHT = 16
 MARGIN_BOTTOM = 12
@@ -267,7 +268,7 @@ def cmd_daemon():
     def make_panel():
         style = NSWindowStyleMaskBorderless | NSWindowStyleMaskNonactivatingPanel
         panel = NSPanel.alloc().initWithContentRect_styleMask_backing_defer_(
-            NSMakeRect(0, 0, SIZE, SIZE), style, NSBackingStoreBuffered, False)
+            NSMakeRect(0, 0, SIZE, SIZE + TAG_H), style, NSBackingStoreBuffered, False)
         panel.setLevel_(NSStatusWindowLevel)
         panel.setOpaque_(False)
         panel.setBackgroundColor_(NSColor.clearColor())
@@ -280,7 +281,7 @@ def cmd_daemon():
             | NSWindowCollectionBehaviorFullScreenAuxiliary
             | NSWindowCollectionBehaviorStationary
             | NSWindowCollectionBehaviorIgnoresCycle)
-        content = NSView.alloc().initWithFrame_(NSMakeRect(0, 0, SIZE, SIZE))
+        content = NSView.alloc().initWithFrame_(NSMakeRect(0, 0, SIZE, SIZE + TAG_H))
         panel.setContentView_(content)
         iv = NSImageView.alloc().initWithFrame_(NSMakeRect(0, 0, SIZE, SIZE))
         iv.setImageScaling_(NSImageScaleProportionallyUpOrDown)
@@ -351,7 +352,7 @@ def cmd_daemon():
                     if cell["label"] is not None:
                         cell["label"].removeFromSuperview()
                     text = ("! " + name) if waiting else name
-                    lbl = rounded_field(NSMakeRect(6, SIZE - 22, SIZE - 12, 18),
+                    lbl = rounded_field(NSMakeRect(6, SIZE - 6, SIZE - 12, 18),
                                         text, wait_bg if waiting else name_bg,
                                         white, name_font, 9)
                     cell["content"].addSubview_(lbl)
@@ -362,7 +363,7 @@ def cmd_daemon():
             vf = NSScreen.mainScreen().visibleFrame()
             x = vf.origin.x + vf.size.width - SIZE - MARGIN_RIGHT
             for i, (sid, cell) in enumerate(sorted(self.cells.items(), key=lambda kv: kv[1]["mt"])):
-                y = vf.origin.y + MARGIN_BOTTOM + i * (SIZE + GAP)
+                y = vf.origin.y + MARGIN_BOTTOM + i * (SIZE + TAG_H + GAP)
                 cell["panel"].setFrameOrigin_(NSMakePoint(x, y))
                 cell["panel"].orderFrontRegardless()
 
